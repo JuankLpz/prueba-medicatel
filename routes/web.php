@@ -1,6 +1,7 @@
 <?php
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HomeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,4 +20,10 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/', 'HomeController@index')->name('home');
+Route::get('/cita', 'ScheduleController@index')->name('schedule.create');
+Route::get('/veterinarios', 'VetController@index')->name('vet.view');
+Route::get('/veterinarios/crear', 'VetController@create')->name('vet.create_vet');
+Route::post('/veterinarios/guardar', 'VetController@save')->name('vet.save_vet');
+Route::get('/veterinario/{file}', 'VetController@avatar')->name('vet.avatar');
+Route::post('/cita/crear', 'ScheduleController@store')->name('schedule.save');

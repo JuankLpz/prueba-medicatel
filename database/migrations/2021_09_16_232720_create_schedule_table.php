@@ -19,6 +19,8 @@ class CreateScheduleTable extends Migration
             $table->dateTime('start');
             $table->unsignedBigInteger('vet_id');
             $table->foreign('vet_id')->references('id')->on('veterinarians');
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users');
             $table->dateTime('end');
             $table->timestamps();
         });
