@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('content')
     <div class="container">
-        <div id="schedule">calendario</div>
+        <div id="schedule"></div>
     </div>
 
 
@@ -21,7 +21,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form action="">
+                    <form action="" id="formulario1">
 
                         {!! csrf_field() !!}
 
@@ -33,14 +33,14 @@
 
                         <div class="form-group">
                             <label for="start">Start</label>
-                            <input type="text" class="form-control" name="start" id="start" aria-describedby="helpId"
+                            <input type="date" class="form-control" name="start" id="start" aria-describedby="helpId"
                                 placeholder="">
 
                         </div>
 
                         <div class="form-group">
                             <label for="end">end</label>
-                            <input type="text" class="form-control" name="end" id="end" aria-describedby="helpId"
+                            <input type="date" class="form-control" name="end" id="end" aria-describedby="helpId"
                                 placeholder="">
 
                         </div>
@@ -48,13 +48,22 @@
                         <div class="form-group">
                             <label for="vet_id">Veterinario</label>
                             <select name="vet_id" class="form-control">
-                                @foreach ($vets as $vet )
-                                   <option value="{{ $vet->id }}">{{ $vet->name }}</option> 
+                                @foreach ($vets as $vet)
+                                    <option value="{{ $vet->id }}">{{ $vet->name }}</option>
                                 @endforeach
-                                
-                              </select>
-                              
+
+                            </select>
+
                         </div>
+
+                        <div class="form-group">
+
+                            <input type="hidden" id="user_id" name="user_id" value="{{ Auth::user()->id }}">
+
+                            <input type="hidden" id="id" name="id" value="">
+                        </div>
+
+
 
                     </form>
                 </div>
@@ -62,8 +71,6 @@
 
                     <button type="button" class="btn btn-success" id="btnGuardar">Guardar</button>
                     <button type="button" class="btn btn-warning" id="btnModificar">Modificar</button>
-                    <button type="button" class="btn btn-danger" id="btnEliminar">Eliminar</button>
-
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
                 </div>
             </div>
@@ -76,7 +83,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
-            let formulario = document.querySelector("form");
+            let formulario = document.getElementById('formulario1');
 
             var calendarEl = document.getElementById('schedule');
 
@@ -90,29 +97,71 @@
                     right: 'dayGridMonth,timeGridWeek,listWeek'
                 },
 
+                events: "http://localhost/laravel/prueba-medicatel/public/cita/mostrar",
+
+
                 dateClick: function(info) {
+                    formulario.reset();
+                    formulario.start.value = info.dateStr;
+                    formulario.end.value = info.dateStr;
+
                     $('#evento').modal("show");
+                },
+
+                eventClick: function(info) {
+                    var evento = info.event;
+
+                    axios.post("http://localhost/laravel/prueba-medicatel/public/cita/editar/"+info.event.id).
+                    then(
+                        (respuesta) => {
+                            formulario.id.value = respuesta.data.id;
+                            console.log(formulario.id.value);
+                            formulario.title.value = respuesta.data.title;
+                            formulario.start.value = respuesta.data.start;
+                            formulario.end.value = respuesta.data.end;
+                            formulario.user_id.value = respuesta.data.user_id;
+                            console.log(formulario.user_id.value);
+                            $("#evento").modal("show");
+                        }
+                    ).catch(
+                        error => {
+                            if (error.response) {
+                                console.log(error.response.data);
+                            }
+                        }
+                    );
                 }
             });
 
             calendar.render();
 
-            document.getElementById("btnGuardar").addEventListener("click",function(){
+            document.getElementById("btnGuardar").addEventListener("click", function() {
+                enviarDatos("http://localhost/laravel/prueba-medicatel/public/cita/crear");
+            });
+
+            document.getElementById("btnModificar").addEventListener("click", function() {
+                enviarDatos("http://localhost/laravel/prueba-medicatel/public/cita/actualizar/"+formulario.id.value);
+            });
+
+
+            function enviarDatos(url){
                 const datos = new FormData(formulario);
-                
-                axios.post("http://veterinaria.com.devel/cita/crear", datos).
+
+                axios.post(url, datos).
                 then(
-                    (respuesta)=>{
+                    (respuesta) => {
+                        calendar.refetchEvents();
                         $("#evento").modal("hide");
                     }
-                    ).catch(
-                        error=>{
-                            if(error.response){
-                                console.log(error.response.data);
-                            }
+                ).catch(
+                    error => {
+                        if (error.response) {
+                            console.log(error.response.data);
                         }
-                    );
-            });
+                    }
+                );
+            }
+
         });
     </script>
 @endsection

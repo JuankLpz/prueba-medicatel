@@ -13,6 +13,11 @@ use Illuminate\Support\Facades\File;
 
 class VetController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+    
     public function index(Request $request){
         $vets= Vet::all();
         return view('vet.view')->with(compact('vets'));

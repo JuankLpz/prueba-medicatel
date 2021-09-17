@@ -12,7 +12,7 @@ class Schedule extends Model
     protected $table = 'schedule';
 
 
-    protected $fillable=['title','start','end'];
+    protected $fillable=['title','start','end','vet_id','user_id'];
 
     public function vet(){
         return $this->belongsTo('App\Vet','vet_id');
