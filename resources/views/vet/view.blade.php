@@ -14,7 +14,7 @@
 
                 @foreach ($vets as $vet)
                 
-                <div class="card" style="width:400px">
+                <div class="card mx-auto" style="width:300px">
                     <img class="card-img-top" src="{{ route('vet.avatar', ['file' => $vet->image]) }}" alt="Card image">
                     <div class="card-body">
                       <h4 class="card-title">{{ $vet->name }}</h4>

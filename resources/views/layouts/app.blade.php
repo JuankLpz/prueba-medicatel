@@ -74,9 +74,12 @@
                                 <a href="{{ route('vet.view') }}" class="nav-link">Veterinarios</a>
                             </li>
 
+                            @if(Auth::user()->role=="admin")
                             <li class="nav-item">
                                 <a href="{{ route('vet.create_vet') }}" class="nav-link">Nuevo Veterinario</a>
-                            </li>
+                            </li>    
+                            @endif
+                            
 
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
